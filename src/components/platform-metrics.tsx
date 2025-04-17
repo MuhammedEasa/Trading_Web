@@ -8,41 +8,43 @@ import Wrapper from "./global/wrapper";
 import { Button } from './ui/button';
 import SectionBadge from './ui/section-badge';
 import { useEffect, useRef, useState } from 'react';
-const AnimatedCounter = ({ value }) => {
+type AnimatedCounterProps = {
+    value: number;
+  };
+  
+  const AnimatedCounter = ({ value }: AnimatedCounterProps) => {
     const [count, setCount] = useState(0);
-    const counterRef = useRef(null);
-    
+    const counterRef = useRef<HTMLSpanElement>(null);
+  
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting) {
-                    let start = 0;
-                    const increment = Math.ceil(value / 30);
-                    const timer = setInterval(() => {
-                        start += increment;
-                        if (start >= value) {
-                            setCount(value);
-                            clearInterval(timer);
-                        } else {
-                            setCount(start);
-                        }
-                    }, 50);
-                    
-                    observer.disconnect();
-                }
-            },
-            { threshold: 0.1 }
-        );
-        
-        if (counterRef.current) {
-            observer.observe(counterRef.current);
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          let start = 0;
+          const increment = Math.ceil(value / 30);
+          const timer = setInterval(() => {
+            start += increment;
+            if (start >= value) {
+              setCount(value);
+              clearInterval(timer);
+            } else {
+              setCount(start);
+            }
+          }, 50);
+  
+          observer.disconnect();
         }
-        
-        return () => observer.disconnect();
+      }, { threshold: 0.1 });
+  
+      if (counterRef.current) {
+        observer.observe(counterRef.current);
+      }
+  
+      return () => observer.disconnect();
     }, [value]);
-    
+  
     return <span ref={counterRef}>{count}</span>;
-};
+  };
+  
 
 const PlatformMetrics = () => {
     return (
